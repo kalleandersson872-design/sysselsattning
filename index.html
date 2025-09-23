@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sysselsättning – Skattningstest (25 frågor)</title>
+  <style>
+    :root{
+      --bg:#0b0f1a; --card:#131a2a; --muted:#9aa3b2; --text:#f3f4f6; --accent:#60a5fa;
+      --ok:#34d399; --warn:#f59e0b; --bad:#ef4444;
+      --bar:#2563eb; --bar-muted:#1f2937; --btn:#111827; --btn-border:#334155;
+      --btn-active:#0ea5e9;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,sans-serif;
+      background:linear-gradient(120deg,#0b0f1a 0%, #0f172a 100%); color:var(--text);
+      min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+    .wrap{width:100%; max-width:880px}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:20px; padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
+    }
+    h1{margin:0 0 8px; font-weight:700; letter-spacing:0.2px}
+    .sub{color:var(--muted); margin:0 0 20px; font-size:14px}
+    .progress{height:10px; background:var(--bar-muted); border-radius:999px; overflow:hidden; margin-bottom:18px}
+    .progress > div{height:100%; width:0%; background:linear-gradient(90deg,var(--bar),#38bdf8); transition:width .25s ease}
+    .qnum{font-size:13px; color:var(--muted); margin-bottom:8px}
+    .qtext{font-size:20px; line-height:1.4; margin-bottom:18px}
+    .scale{
+      display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:6px;
+    }
+    .btn{
+      border:1px solid var(--btn-border); background:var(--btn);
+      color:var(--text); padding:14px 10px; border-radius:12px; text-align:center;
+      cursor:pointer; user-select:none; transition:transform .05s ease, border-color .15s ease, background .15s ease;
+      font-weight:600;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.selected{outline:2px solid var(--btn-active); border-color:var(--btn-active); background:#0b1726}
+    .labels{display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:6px}
+    .nav{display:flex; gap:10px; margin-top:16px}
+    .nav .primary{
+      background:linear-gradient(90deg,#2563eb,#38bdf8); border:none; color:#fff;
+      padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700;
+    }
+    .nav .secondary{
+      background:transparent; border:1px solid var(--btn-border); color:var(--text);
+      padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:600;
+    }
+    .nav .primary:disabled{opacity:.5; cursor:not-allowed}
+    .hidden{display:none}
+    .result-grid{display:grid; grid-template-columns:1fr; gap:16px; margin-top:12px}
+    .kpi{display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:14px 16px; border-radius:12px}
+    .kpi .v{font-size:22px; font-weight:800}
+    .pill{font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); color:var(--muted)}
+    .barbox{height:12px; background:var(--bar-muted); border-radius:999px; overflow:hidden}
+    .barin{height:100%; width:0%}
+    .ok{background:linear-gradient(90deg,#16a34a,#34d399)}
+    .warn{background:linear-gradient(90deg,#ca8a04,#f59e0b)}
+    .bad{background:linear-gradient(90deg,#b91c1c,#ef4444)}
+    .export{
+      margin-top:4px; display:flex; flex-wrap:wrap; gap:10px;
+    }
+    .hint{color:var(--muted); font-size:12px; margin-top:6px}
+    .list{margin-top:8px; max-height:260px; overflow:auto; border:1px solid rgba(255,255,255,0.08); border-radius:12px}
+    .row{display:grid; grid-template-columns:auto 1fr auto; gap:10px; padding:10px 12px; border-bottom:1px dashed rgba(255,255,255,0.06)}
+    .row:last-child{border-bottom:none}
+    .row .ix{color:var(--muted); font-size:12px; width:34px}
+    .row .qt{font-size:14px; line-height:1.4}
+    .row .ans{font-weight:800}
+    .legend{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
+    .legend span{font-size:12px; color:var(--muted)}
+    .footer{margin-top:18px; color:var(--muted); font-size:12px}
+    @media (min-width:720px){
+      .result-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Sysselsättning – Skattningstest</h1>
+    <p class="sub">25 frågor • svarsskala 1–5 • en fråga i taget • export av svar till .txt</p>
+
+    <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+
+    <div id="screen-question">
+      <div class="qnum" id="qnum">Fråga 1 av 25</div>
+      <div class="qtext" id="qtext"></div>
+
+      <div class="scale" id="scale">
+        <!-- 5 valbara knappar 1–5 -->
+      </div>
+      <div class="labels">
+        <span>1 = Stämmer inte</span>
+        <span>5 = Stämmer helt</span>
+      </div>
+
+      <div class="nav">
+        <button id="prevBtn" class="secondary" type="button">Föregående</button>
+        <button id="nextBtn" class="primary" type="button" disabled>Nästa</button>
+      </div>
+
+      <div class="legend">
+        <span>Tips: Klicka siffran för att välja (1–5).</span>
+      </div>
+    </div>
+
+    <div id="screen-result" class="hidden">
+      <h2>Resultat</h2>
+      <div class="result-grid">
+        <div class="kpi">
+          <div>
+            <div class="pill">Totalpoäng (0–100)</div>
+            <div class="hint">Skalas från genomsnittligt svar × 20</div>
+          </div>
+          <div class="v" id="scoreTotal">–</div>
+        </div>
+
+        <div class="kpi">
+          <div>
+            <div class="pill">Medelvärde (1–5)</div>
+            <div class="hint">Genomsnitt av alla svar</div>
+          </div>
+          <div class="v" id="scoreMean">–</div>
+        </div>
+
+        <div class="kpi">
+          <div style="flex:1">
+            <div class="pill">Visuell nivå</div>
+            <div class="barbox" style="margin-top:8px">
+              <div id="scoreBar" class="barin ok" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="v" id="levelTag" style="margin-left:12px">–</div>
+        </div>
+
+        <div class="kpi">
+          <div>
+            <div class="pill">Svar täckning</div>
+            <div class="hint" id="coverage">–</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="export">
+        <button id="btnExport" class="secondary" type="button">Exportera frågor + svar (.txt)</button>
+        <button id="btnRestart" class="primary" type="button">Gör testet igen</button>
+      </div>
+
+      <div class="list" id="answerList" aria-live="polite"></div>
+
+      <div class="footer">Detta är ett egenrapport-test. Använd resultatet som ett underlag för reflektion och fortsatt arbete.</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/**
+ * 25 fördjupande frågor för SYSSelsättning, härledda från de 10 basfrågorna i "Coachingtest frågor".
+ * Skala: 1–5 (endast siffror, inga dropdowns).
+ * En fråga i taget, progress, export till txt.
+ */
+
+const base10 = [
+  "Jag trivs med min nuvarande sysselsättning (arbete/studier).",
+  "Mina uppgifter känns meningsfulla och viktiga.",
+  "Jag har en hållbar balans mellan sysselsättning och privatliv.",
+  "Jag utvecklas och lär mig kontinuerligt.",
+  "Jag känner trygghet i anställning/karriärriktning.",
+  "Jag får stöd av kollegor/klasskamrater och närmaste chef/handledare.",
+  "Arbetsbelastningen är rimlig och hanterbar.",
+  "Målen i min sysselsättning är tydliga och realistiska.",
+  "Jag har tillräcklig autonomi/inflytande i mitt arbete.",
+  "Jag är nöjd med nuläget och ser positivt på framtiden."
+];
+
+// 25 fördjupningar (mix av omformuleringar/konkretioner av bas-10)
+const questions = [
+  base10[0],
+  "Jag skulle rekommendera min arbetsplats/utbildning till andra.",
+  "Jag använder mina styrkor i uppgifterna jag gör.",
+  base10[1],
+  "Det jag gör bidrar till något större än mig själv.",
+  base10[2],
+  "Jag kan sätta gränser för arbete/studier när det behövs.",
+  "Jag har tid och energi kvar efter arbets-/studiedagen.",
+  base10[3],
+  "Jag får relevant feedback som hjälper mig framåt.",
+  "Jag har tillgång till kompetensutveckling/utbildning.",
+  base10[4],
+  "Jag vet vilka steg jag kan ta om förutsättningarna förändras.",
+  base10[5],
+  "Jag får erkännande när jag gör ett bra jobb.",
+  "Samarbetet i mitt team fungerar väl.",
+  base10[6],
+  "Jag hinner återhämta mig under och mellan arbets-/studiepass.",
+  base10[7],
+  "Jag förstår hur mitt arbete kopplar till verksamhetens mål.",
+  base10[8],
+  "Jag kan planera min tid och mitt arbetssätt på ett effektivt sätt.",
+  "Jag kan påverka beslut som berör mina uppgifter.",
+  base10[9],
+  "Jag ser en tydlig utvecklingsväg de kommande 12 månaderna.",
+  "Jag har en rimlig arbetstakt även i intensiva perioder.",
+  "Min arbets-/studieplats erbjuder en stödjande miljö.",
+  "Jag hanterar stress i sysselsättningen på ett bra sätt.",
+  "Mitt engagemang är högt i vardagen."
+];
+
+const state = {
+  i: 0,
+  answers: Array(questions.length).fill(null)
+};
+
+const el = {
+  bar: document.getElementById('bar'),
+  qnum: document.getElementById('qnum'),
+  qtext: document.getElementById('qtext'),
+  scale: document.getElementById('scale'),
+  prev: document.getElementById('prevBtn'),
+  next: document.getElementById('nextBtn'),
+  screenQ: document.getElementById('screen-question'),
+  screenR: document.getElementById('screen-result'),
+  scoreTotal: document.getElementById('scoreTotal'),
+  scoreMean: document.getElementById('scoreMean'),
+  scoreBar: document.getElementById('scoreBar'),
+  levelTag: document.getElementById('levelTag'),
+  coverage: document.getElementById('coverage'),
+  list: document.getElementById('answerList'),
+  export: document.getElementById('btnExport'),
+  restart: document.getElementById('btnRestart')
+};
+
+function renderQuestion() {
+  const n = state.i + 1;
+  el.qnum.textContent = `Fråga ${n} av ${questions.length}`;
+  el.qtext.textContent = questions[state.i];
+
+  // Progress
+  const answeredCount = state.answers.filter(v => v !== null).length;
+  const progressPct = Math.round((answeredCount / questions.length) * 100);
+  el.bar.style.width = `${Math.max(progressPct, (state.i)/questions.length*100)}%`;
+
+  // Scale buttons 1–5
+  el.scale.innerHTML = '';
+  for (let v = 1; v <= 5; v++) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn';
+    b.textContent = String(v);
+    b.setAttribute('aria-label', `Välj ${v}`);
+    if (state.answers[state.i] === v) b.classList.add('selected');
+    b.addEventListener('click', () => {
+      state.answers[state.i] = v;
+      document.querySelectorAll('.scale .btn').forEach(x => x.classList.remove('selected'));
+      b.classList.add('selected');
+      el.next.disabled = false;
+    });
+    el.scale.appendChild(b);
+  }
+
+  // Nav buttons
+  el.prev.disabled = state.i === 0;
+  el.next.textContent = state.i === questions.length - 1 ? 'Visa resultat' : 'Nästa';
+  el.next.disabled = state.answers[state.i] == null;
+}
+
+function next() {
+  if (state.i === questions.length - 1) {
+    showResult();
+  } else {
+    state.i++;
+    renderQuestion();
+  }
+}
+function prev() {
+  if (state.i > 0) {
+    state.i--;
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  const answered = state.answers.filter(v => v != null);
+  const mean = answered.length ? (answered.reduce((a,b)=>a+b,0) / answered.length) : 0;
+  const total = Math.round(mean * 20); // 1–5 -> 20–100
+  const pct = total; // 0–100
+
+  el.scoreTotal.textContent = `${total}`;
+  el.scoreMean.textContent = mean ? mean.toFixed(2) : '–';
+  el.coverage.textContent = `${answered.length} / ${questions.length} besvarade`;
+
+  // Bar color & label
+  el.scoreBar.classList.remove('ok','warn','bad');
+  let label = 'Låg';
+  if (pct >= 67) { el.scoreBar.classList.add('ok'); label='Hög'; }
+  else if (pct >= 45) { el.scoreBar.classList.add('warn'); label='Medel'; }
+  else { el.scoreBar.classList.add('bad'); label='Låg'; }
+  el.levelTag.textContent = label;
+  el.scoreBar.style.width = `${pct}%`;
+
+  // List answers
+  el.list.innerHTML = '';
+  questions.forEach((q, idx) => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    const ix = document.createElement('div'); ix.className='ix'; ix.textContent = `#${idx+1}`;
+    const qt = document.createElement('div'); qt.className='qt'; qt.textContent = q;
+    const ans = document.createElement('div'); ans.className='ans'; ans.textContent = state.answers[idx] ?? '–';
+    row.append(ix, qt, ans);
+    el.list.appendChild(row);
+  });
+
+  // Swap screens
+  el.screenQ.classList.add('hidden');
+  el.screenR.classList.remove('hidden');
+}
+
+function exportTxt() {
+  const lines = [];
+  lines.push('Sysselsättning – Skattningstest (25 frågor)');
+  lines.push(`Datum: ${new Date().toISOString()}`);
+  lines.push('');
+  for (let i=0;i<questions.length;i++){
+    lines.push(`Fråga ${i+1}: ${questions[i]}`);
+    lines.push(`Svar: ${state.answers[i] ?? ''}`);
+    lines.push('');
+  }
+  const answered = state.answers.filter(v => v!=null);
+  const mean = answered.length ? (answered.reduce((a,b)=>a+b,0) / answered.length) : 0;
+  const total = Math.round(mean * 20);
+  lines.push(`Medelvärde (1–5): ${mean ? mean.toFixed(2) : '-'}`);
+  lines.push(`Totalpoäng (0–100): ${isNaN(total)?'-':total}`);
+  lines.push(`Svarstäckning: ${answered.length}/${questions.length}`);
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'sysselsattning_svar.txt';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function restart() {
+  state.i = 0;
+  state.answers = Array(questions.length).fill(null);
+  el.screenR.classList.add('hidden');
+  el.screenQ.classList.remove('hidden');
+  renderQuestion();
+}
+
+// Keyboard shortcuts for speed (1–5, arrows, enter)
+document.addEventListener('keydown', (e) => {
+  if (!el.screenQ.classList.contains('hidden')) {
+    if (e.key >= '1' && e.key <= '5') {
+      const val = parseInt(e.key,10);
+      state.answers[state.i] = val;
+      renderQuestion();
+      el.next.disabled = false;
+    } else if (e.key === 'ArrowRight') {
+      if (!el.next.disabled) next();
+    } else if (e.key === 'ArrowLeft') {
+      prev();
+    } else if (e.key === 'Enter') {
+      if (!el.next.disabled) next();
+    }
+  }
+});
+
+// Wire up
+el.prev.addEventListener('click', prev);
+el.next.addEventListener('click', next);
+el.export.addEventListener('click', exportTxt);
+el.restart.addEventListener('click', restart);
+
+// Init
+renderQuestion();
+</script>
+</body>
+</html>
