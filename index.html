@@ -6,10 +6,8 @@
   <title>Sysselsättning – Skattningstest (25 frågor)</title>
   <style>
     :root{
-      --bg:#0b0f1a; --card:#131a2a; --muted:#9aa3b2; --text:#f3f4f6; --accent:#60a5fa;
-      --ok:#34d399; --warn:#f59e0b; --bad:#ef4444;
-      --bar:#2563eb; --bar-muted:#1f2937; --btn:#111827; --btn-border:#334155;
-      --btn-active:#0ea5e9;
+      --bg:#0b0f1a; --card:#131a2a; --muted:#9ca3af; --text:#f3f4f6; --accent:#60a5fa;
+      --ok:#34d399; --warn:#f59e0b; --bad:#ef4444; --bar:#2563eb; --bar-muted:#1f2937;
     }
     *{box-sizing:border-box}
     body{
@@ -17,371 +15,524 @@
       background:linear-gradient(120deg,#0b0f1a 0%, #0f172a 100%); color:var(--text);
       min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
     }
-    .wrap{width:100%; max-width:880px}
+    .wrap{width:100%; max-width:900px}
     .card{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border:1px solid rgba(255,255,255,0.08);
-      border-radius:20px; padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.35);
-      backdrop-filter: blur(6px);
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.35);
+      overflow:hidden;
     }
-    h1{margin:0 0 8px; font-weight:700; letter-spacing:0.2px}
-    .sub{color:var(--muted); margin:0 0 20px; font-size:14px}
-    .progress{height:10px; background:var(--bar-muted); border-radius:999px; overflow:hidden; margin-bottom:18px}
-    .progress > div{height:100%; width:0%; background:linear-gradient(90deg,var(--bar),#38bdf8); transition:width .25s ease}
-    .qnum{font-size:13px; color:var(--muted); margin-bottom:8px}
-    .qtext{font-size:20px; line-height:1.4; margin-bottom:18px}
-    .scale{
-      display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:6px;
+    header{
+      padding:22px 24px; border-bottom:1px solid rgba(255,255,255,0.06);
+      display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
     }
+    h1{font-size:20px; margin:0; font-weight:700}
+    .muted{color:var(--muted); font-size:14px}
+    .bar{height:10px; width:100%; background:var(--bar-muted); border-radius:999px; overflow:hidden}
+    .bar>span{display:block; height:100%; width:0%; background:linear-gradient(90deg,#1d4ed8,#3b82f6); transition:width 240ms ease}
+    .content{padding:24px}
+    .q-meta{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
+    .q-theme{font-size:13px; color:var(--muted)}
+    .question{font-size:22px; line-height:1.35; margin:6px 0 14px}
+    .scale{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:8px}
     .btn{
-      border:1px solid var(--btn-border); background:var(--btn);
-      color:var(--text); padding:14px 10px; border-radius:12px; text-align:center;
-      cursor:pointer; user-select:none; transition:transform .05s ease, border-color .15s ease, background .15s ease;
-      font-weight:600;
+      appearance:none; border:none; border-radius:12px; padding:14px 16px; font-weight:600;
+      color:var(--text); cursor:pointer; background:#0f172a; border:1px solid rgba(255,255,255,0.08);
+      transition:transform 120ms ease, background 120ms ease, border 120ms ease;
     }
     .btn:hover{transform:translateY(-1px)}
-    .btn.selected{outline:2px solid var(--btn-active); border-color:var(--btn-active); background:#0b1726}
-    .labels{display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:6px}
-    .nav{display:flex; gap:10px; margin-top:16px}
-    .nav .primary{
-      background:linear-gradient(90deg,#2563eb,#38bdf8); border:none; color:#fff;
-      padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:700;
+    .btn.primary{background:linear-gradient(180deg,#1f62ff,#1140bf); border-color:rgba(255,255,255,0.12)}
+    .btn.ghost{background:transparent}
+    .scale .option{
+      background:rgba(255,255,255,0.04);
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.08);
+      cursor:pointer; user-select:none;
+      transition:transform 120ms ease,border 120ms ease,background 120ms ease;
+      font-size:18px; font-weight:700; line-height:1;
+      display:flex; align-items:center; justify-content:center; height:58px;
     }
-    .nav .secondary{
-      background:transparent; border:1px solid var(--btn-border); color:var(--text);
-      padding:12px 16px; border-radius:12px; cursor:pointer; font-weight:600;
+    .scale .option:hover{transform:translateY(-1px); background:rgba(255,255,255,0.06)}
+    .scale .option.active{outline:2px solid var(--accent); background:rgba(96,165,250,0.18); border-color:rgba(96,165,250,0.6)}
+    .legend{display:flex; justify-content:space-between; font-size:12px; color:var(--muted); margin-top:6px}
+    .actions{display:flex; justify-content:space-between; gap:10px; margin-top:22px}
+    .kbd{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; background:#111827; padding:2px 6px; border-radius:6px; border:1px solid rgba(255,255,255,0.08)}
+    .result{
+      display:grid; gap:14px; margin-top:6px;
+      background:rgba(0,0,0,0.25); padding:18px; border:1px solid rgba(255,255,255,0.06); border-radius:12px;
     }
-    .nav .primary:disabled{opacity:.5; cursor:not-allowed}
+    .meter{height:12px; background:var(--bar-muted); border-radius:999px; overflow:hidden}
+    .meter>span{display:block; height:100%; width:0%; transition:width 300ms ease}
+    .tag{font-size:12px; color:white; padding:2px 8px; border-radius:999px; display:inline-block}
+    .tag.ok{background:var(--ok)} .tag.warn{background:var(--warn)} .tag.bad{background:var(--bad)}
     .hidden{display:none}
-    .result-grid{display:grid; grid-template-columns:1fr; gap:16px; margin-top:12px}
-    .kpi{display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); padding:14px 16px; border-radius:12px}
-    .kpi .v{font-size:22px; font-weight:800}
-    .pill{font-size:12px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,0.12); color:var(--muted)}
-    .barbox{height:12px; background:var(--bar-muted); border-radius:999px; overflow:hidden}
-    .barin{height:100%; width:0%}
-    .ok{background:linear-gradient(90deg,#16a34a,#34d399)}
-    .warn{background:linear-gradient(90deg,#ca8a04,#f59e0b)}
-    .bad{background:linear-gradient(90deg,#b91c1c,#ef4444)}
-    .export{
-      margin-top:4px; display:flex; flex-wrap:wrap; gap:10px;
-    }
-    .hint{color:var(--muted); font-size:12px; margin-top:6px}
-    .list{margin-top:8px; max-height:260px; overflow:auto; border:1px solid rgba(255,255,255,0.08); border-radius:12px}
-    .row{display:grid; grid-template-columns:auto 1fr auto; gap:10px; padding:10px 12px; border-bottom:1px dashed rgba(255,255,255,0.06)}
-    .row:last-child{border-bottom:none}
-    .row .ix{color:var(--muted); font-size:12px; width:34px}
-    .row .qt{font-size:14px; line-height:1.4}
-    .row .ans{font-weight:800}
-    .legend{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
-    .legend span{font-size:12px; color:var(--muted)}
-    .footer{margin-top:18px; color:var(--muted); font-size:12px}
-    @media (min-width:720px){
-      .result-grid{grid-template-columns:1fr 1fr}
-    }
+    .footer{padding:18px 24px; border-top:1px solid rgba(255,255,255,0.06); display:flex; gap:12px; justify-content:space-between; flex-wrap:wrap}
+    a.btn-link{color:var(--accent); text-decoration:none}
+
+    /* Kontaktformulär */
+    .form{ display:grid; gap:10px; margin-top:12px }
+    .input{ width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); color:var(--text); }
+    .helper{ font-size:12px; color:var(--muted) }
+    .error{ color:#fecaca; font-size:12px; display:none }
+    .row{ display:grid; gap:10px }
+    @media(min-width:640px){ .row{ grid-template-columns:1fr 1fr } }
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <h1>Sysselsättning – Skattningstest</h1>
-    <p class="sub">25 frågor • svarsskala 1–5 • en fråga i taget • export av svar till .txt</p>
+  <div class="wrap">
+    <div class="card" id="app">
+      <header>
+        <div>
+          <h1>Sysselsättning – Skattningstest (25 frågor)</h1>
+          <div class="muted">En fråga i taget. Svara 1–5. <span class="kbd">1–5</span> fungerar som kortkommandon.</div>
+        </div>
+        <div style="min-width:260px">
+          <div class="bar" aria-label="Framsteg"><span id="progress"></span></div>
+          <div class="muted" id="counter" style="text-align:right; margin-top:6px">0 / 25</div>
+        </div>
+      </header>
 
-    <div class="progress" aria-hidden="true"><div id="bar"></div></div>
-
-    <div id="screen-question">
-      <div class="qnum" id="qnum">Fråga 1 av 25</div>
-      <div class="qtext" id="qtext"></div>
-
-      <div class="scale" id="scale">
-        <!-- 5 valbara knappar 1–5 -->
+      <!-- Frågevy -->
+      <div class="content" id="questionView">
+        <div class="q-meta">
+          <div class="q-theme" id="qTheme">Tema</div>
+          <div class="q-theme" id="qId">Fråga 1/25</div>
+        </div>
+        <div class="question" id="qText">…</div>
+        <div class="scale" id="scale"></div>
+        <div class="legend"><span>1 = Stämmer inte alls</span><span>5 = Stämmer helt</span></div>
+        <div class="actions">
+          <button class="btn ghost" id="prevBtn" disabled>Föregående</button>
+          <div style="display:flex; gap:10px">
+            <button class="btn" id="clearBtn">Rensa</button>
+            <button class="btn primary" id="nextBtn">Nästa</button>
+          </div>
+        </div>
       </div>
-      <div class="labels">
-        <span>1 = Stämmer inte</span>
-        <span>5 = Stämmer helt</span>
+
+      <!-- Resultatvy -->
+      <div class="content hidden" id="resultView" aria-live="polite">
+        <h2 style="margin:0 0 8px 0; font-size:20px">Resultat</h2>
+        <div class="muted">Skala 0–100 beräknad som genomsnitt (1–5) omräknat till procent.</div>
+
+        <div class="result">
+          <div style="display:flex; justify-content:space-between; align-items:center">
+            <div><strong>Samlat sysselsättningsläge</strong></div>
+            <div id="totalTag" class="tag">—</div>
+          </div>
+          <div class="meter" aria-label="Totalpoäng"><span id="totalBar" style="background:linear-gradient(90deg,#059669,#10b981)"></span></div>
+          <div class="muted" id="totalText">—</div>
+        </div>
+
+        <h3 style="margin:14px 0 6px 0; font-size:16px">Delskalor</h3>
+        <div class="result" id="subscalesContainer"></div>
+
+        <div class="actions" style="margin-top:8px">
+          <button class="btn ghost" id="restartBtn">Starta om</button>
+          <button class="btn primary" id="exportBtn">Exportera resultat (.txt)</button>
+        </div>
+
+        <!-- Säljpitch + kontaktformulär -->
+        <div class="content" id="coachingPitch" style="margin-top:24px; background:rgba(0,0,0,0.25); padding:18px; border:1px solid rgba(255,255,255,0.06); border-radius:12px;">
+          <h2 style="margin:0 0 10px 0; font-size:20px;">Coachande samtal – nästa steg mot din plan</h2>
+          <p>Du har en nulägesbild. Nu omsätter vi den till handling. I ett coachande samtal får du:</p>
+          <ul>
+            <li>Konkret handlingsplan kopplad till ditt resultat (mål, delmål, mätpunkter).</li>
+            <li>Prioriteringsstöd: vad ger störst effekt först.</li>
+            <li>Ansvarstagande och uppföljning mellan samtal.</li>
+            <li>Evidensnära metoder inom beteendeförändring.</li>
+          </ul>
+
+          <h3 style="margin-top:18px; font-size:16px;">Upplägg</h3>
+          <ul>
+            <li>60 min digitalt eller på plats.</li>
+            <li>Förberedelse: kort formulär utifrån ditt testresultat.</li>
+            <li>Sammanfattning + nästa veckas uppgifter skickas efteråt.</li>
+          </ul>
+
+          <h3 style="margin-top:18px; font-size:16px;">Vem är jag?</h3>
+          <p>Jag studerar <strong>folkhälsovetenskap med inriktning beteendevetenskap</strong> och erbjuder därför
+          <strong>rabatterad coaching</strong> under studietiden.</p>
+
+          <h3 style="margin-top:18px; font-size:16px;">Sekretess & lagstöd</h3>
+          <p class="helper">
+            Personuppgifter hanteras enligt <strong>GDPR (EU 2016/679)</strong> och <strong>Dataskyddslagen (2018:218)</strong>.
+            Hälsouppgifter kräver uttryckligt samtycke (GDPR art. 9.2 a). Konfidentialitet säkerställs via sekretessavtal,
+            dataminimering, åtkomstbegränsning och krypterad lagring. Om samtal sker inom offentlig verksamhet gäller även
+            <em>Offentlighets- och sekretesslagen (2009:400)</em> samt <em>Patientsäkerhetslagen (2010:659)</em>.
+            I min roll som privat coach gäller primärt GDPR + avtalad sekretess.
+          </p>
+
+          <!-- Kontaktformulär (serverlöst via FormSubmit) -->
+          <div class="result" style="margin-top:14px;">
+            <h3 style="margin:0 0 6px 0; font-size:16px;">Boka eller ställ en fråga</h3>
+            <p class="helper">Fyll i namn och e-post. Meddelandet skickas direkt till <strong>kalle.forshell0038@stud.hkr.se</strong>.</p>
+
+            <form id="contactForm"
+                  class="form"
+                  action="https://formsubmit.co/kalle.forshell0038@stud.hkr.se"
+                  method="POST"
+                  onsubmit="return prepareFormPayload()">
+
+              <!-- FormSubmit-inställningar -->
+              <input type="hidden" name="_subject" value="Intresse för coachande samtal – testresultat (sysselsättning) bifogat" />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_captcha" value="false" />
+              <!-- Valfritt: tack-sida -->
+              <!-- <input type="hidden" name="_next" value="https://<anv>.github.io/<repo>/tack.html" /> -->
+
+              <!-- Honeypot (spamskydd) -->
+              <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+
+              <div class="row">
+                <div>
+                  <label for="cf_name" class="helper">Namn</label>
+                  <input id="cf_name" class="input" type="text" name="Namn" required autocomplete="name" />
+                  <div id="err_name" class="error">Ange ditt namn.</div>
+                </div>
+                <div>
+                  <label for="cf_email" class="helper">E-post</label>
+                  <input id="cf_email" class="input" type="email" name="E-post" required autocomplete="email" />
+                  <div id="err_email" class="error">Ange en giltig e-postadress.</div>
+                </div>
+              </div>
+
+              <!-- Fält som auto-fylls från testresultatet -->
+              <input type="hidden" id="cf_total" name="Totalpoäng (0–100)" />
+              <input type="hidden" id="cf_summary" name="Sammanfattning" />
+              <input type="hidden" id="cf_subscales" name="Delskalor" />
+
+              <!-- GDPR-samtycke -->
+              <label class="helper" style="display:flex; gap:8px; align-items:center; margin-top:6px;">
+                <input id="cf_consent" type="checkbox" required />
+                Jag samtycker till att mina uppgifter används för kontakt och bokning enligt GDPR.
+              </label>
+
+              <div style="display:flex; gap:8px; margin-top:8px;">
+                <button class="btn primary" type="submit">Skicka</button>
+                <a class="btn ghost" href="mailto:kalle.forshell0038@stud.hkr.se">Öppna i mejlklient</a>
+              </div>
+
+              <p class="helper" style="margin-top:6px;">
+                Kontakt: <a href="mailto:kalle.forshell0038@stud.hkr.se">kalle.forshell0038@stud.hkr.se</a>
+              </p>
+            </form>
+          </div>
+        </div>
       </div>
 
-      <div class="nav">
-        <button id="prevBtn" class="secondary" type="button">Föregående</button>
-        <button id="nextBtn" class="primary" type="button" disabled>Nästa</button>
-      </div>
-
-      <div class="legend">
-        <span>Tips: Klicka siffran för att välja (1–5).</span>
+      <div class="footer">
+        <div class="muted">Byggt för GitHub Pages. Export till .txt, serverlöst kontaktformulär.</div>
+        <div><a class="btn-link" href="#" id="jumpUnanswered">Hoppa till obesvarad</a></div>
       </div>
     </div>
-
-    <div id="screen-result" class="hidden">
-      <h2>Resultat</h2>
-      <div class="result-grid">
-        <div class="kpi">
-          <div>
-            <div class="pill">Totalpoäng (0–100)</div>
-            <div class="hint">Skalas från genomsnittligt svar × 20</div>
-          </div>
-          <div class="v" id="scoreTotal">–</div>
-        </div>
-
-        <div class="kpi">
-          <div>
-            <div class="pill">Medelvärde (1–5)</div>
-            <div class="hint">Genomsnitt av alla svar</div>
-          </div>
-          <div class="v" id="scoreMean">–</div>
-        </div>
-
-        <div class="kpi">
-          <div style="flex:1">
-            <div class="pill">Visuell nivå</div>
-            <div class="barbox" style="margin-top:8px">
-              <div id="scoreBar" class="barin ok" style="width:0%"></div>
-            </div>
-          </div>
-          <div class="v" id="levelTag" style="margin-left:12px">–</div>
-        </div>
-
-        <div class="kpi">
-          <div>
-            <div class="pill">Svar täckning</div>
-            <div class="hint" id="coverage">–</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="export">
-        <button id="btnExport" class="secondary" type="button">Exportera frågor + svar (.txt)</button>
-        <button id="btnRestart" class="primary" type="button">Gör testet igen</button>
-      </div>
-
-      <div class="list" id="answerList" aria-live="polite"></div>
-
-      <div class="footer">Detta är ett egenrapport-test. Använd resultatet som ett underlag för reflektion och fortsatt arbete.</div>
-    </div>
-
   </div>
-</div>
 
-<script>
-/**
- * 25 fördjupande frågor för SYSSelsättning, härledda från de 10 basfrågorna i "Coachingtest frågor".
- * Skala: 1–5 (endast siffror, inga dropdowns).
- * En fråga i taget, progress, export till txt.
- */
+  <script>
+    // ------- Skala-etiketter (för tooltip & export) -------
+    const LABELS = {
+      1: "Stämmer inte alls",
+      2: "Stämmer lite",
+      3: "Neutral / delvis",
+      4: "Stämmer mycket",
+      5: "Stämmer helt"
+    };
 
-const base10 = [
-  "Jag trivs med min nuvarande sysselsättning (arbete/studier).",
-  "Mina uppgifter känns meningsfulla och viktiga.",
-  "Jag har en hållbar balans mellan sysselsättning och privatliv.",
-  "Jag utvecklas och lär mig kontinuerligt.",
-  "Jag känner trygghet i anställning/karriärriktning.",
-  "Jag får stöd av kollegor/klasskamrater och närmaste chef/handledare.",
-  "Arbetsbelastningen är rimlig och hanterbar.",
-  "Målen i min sysselsättning är tydliga och realistiska.",
-  "Jag har tillräcklig autonomi/inflytande i mitt arbete.",
-  "Jag är nöjd med nuläget och ser positivt på framtiden."
-];
+    // ------- Frågor (25, Sysselsättning) -------
+    const QUESTIONS = [
+      // Engagemang & Motivation
+      {id:1, theme:"Engagemang & Motivation", text:"Jag känner mig engagerad i min nuvarande sysselsättning större delen av veckan.", reverse:false},
+      {id:2, theme:"Engagemang & Motivation", text:"Mitt arbete/aktiva vardag känns meningsfull i relation till mina värderingar.", reverse:false},
+      {id:3, theme:"Engagemang & Motivation", text:"Jag ser tydligt hur mina insatser bidrar till något större.", reverse:false},
 
-// 25 fördjupningar (mix av omformuleringar/konkretioner av bas-10)
-const questions = [
-  base10[0],
-  "Jag skulle rekommendera min arbetsplats/utbildning till andra.",
-  "Jag använder mina styrkor i uppgifterna jag gör.",
-  base10[1],
-  "Det jag gör bidrar till något större än mig själv.",
-  base10[2],
-  "Jag kan sätta gränser för arbete/studier när det behövs.",
-  "Jag har tid och energi kvar efter arbets-/studiedagen.",
-  base10[3],
-  "Jag får relevant feedback som hjälper mig framåt.",
-  "Jag har tillgång till kompetensutveckling/utbildning.",
-  base10[4],
-  "Jag vet vilka steg jag kan ta om förutsättningarna förändras.",
-  base10[5],
-  "Jag får erkännande när jag gör ett bra jobb.",
-  "Samarbetet i mitt team fungerar väl.",
-  base10[6],
-  "Jag hinner återhämta mig under och mellan arbets-/studiepass.",
-  base10[7],
-  "Jag förstår hur mitt arbete kopplar till verksamhetens mål.",
-  base10[8],
-  "Jag kan planera min tid och mitt arbetssätt på ett effektivt sätt.",
-  "Jag kan påverka beslut som berör mina uppgifter.",
-  base10[9],
-  "Jag ser en tydlig utvecklingsväg de kommande 12 månaderna.",
-  "Jag har en rimlig arbetstakt även i intensiva perioder.",
-  "Min arbets-/studieplats erbjuder en stödjande miljö.",
-  "Jag hanterar stress i sysselsättningen på ett bra sätt.",
-  "Mitt engagemang är högt i vardagen."
-];
+      // Karriärmål & Plan
+      {id:4, theme:"Karriärmål & Plan", text:"Jag har tydliga mål för min sysselsättning de kommande 6–24 månaderna.", reverse:false},
+      {id:5, theme:"Karriärmål & Plan", text:"Jag har en konkret plan med steg som för mig närmare mina mål.", reverse:false},
+      {id:6, theme:"Karriärmål & Plan", text:"Jag följer upp min plan regelbundet och justerar vid behov.", reverse:false},
 
-const state = {
-  i: 0,
-  answers: Array(questions.length).fill(null)
-};
+      // Kompetens & Lärande
+      {id:7, theme:"Kompetens & Lärande", text:"Jag utvecklar aktivt mina färdigheter genom kurser, praktik eller handledning.", reverse:false},
+      {id:8, theme:"Kompetens & Lärande", text:"Jag får relevant feedback som hjälper mig att växa.", reverse:false},
+      {id:9, theme:"Kompetens & Lärande", text:"Min kompetensprofil matchar de krav jag möter eller vill möta.", reverse:false},
 
-const el = {
-  bar: document.getElementById('bar'),
-  qnum: document.getElementById('qnum'),
-  qtext: document.getElementById('qtext'),
-  scale: document.getElementById('scale'),
-  prev: document.getElementById('prevBtn'),
-  next: document.getElementById('nextBtn'),
-  screenQ: document.getElementById('screen-question'),
-  screenR: document.getElementById('screen-result'),
-  scoreTotal: document.getElementById('scoreTotal'),
-  scoreMean: document.getElementById('scoreMean'),
-  scoreBar: document.getElementById('scoreBar'),
-  levelTag: document.getElementById('levelTag'),
-  coverage: document.getElementById('coverage'),
-  list: document.getElementById('answerList'),
-  export: document.getElementById('btnExport'),
-  restart: document.getElementById('btnRestart')
-};
+      // Arbetsbelastning & Balans
+      {id:10, theme:"Arbetsbelastning & Balans", text:"Min arbetsbelastning är hållbar sett över en normal månad.", reverse:false},
+      {id:11, theme:"Arbetsbelastning & Balans", text:"Jag kan sätta gränser för att skydda återhämtning och fritid.", reverse:false},
+      {id:12, theme:"Arbetsbelastning & Balans", text:"Jag hinner med mina viktigaste uppgifter utan att skjuta upp dem.", reverse:false},
 
-function renderQuestion() {
-  const n = state.i + 1;
-  el.qnum.textContent = `Fråga ${n} av ${questions.length}`;
-  el.qtext.textContent = questions[state.i];
+      // Stress & Välmående (reverse)
+      {id:13, theme:"Stress & Välmående", text:"Min sysselsättning orsakar ofta stress som påverkar mitt mående.", reverse:true},
+      {id:14, theme:"Stress & Välmående", text:"Jag grubblar mycket över jobbet/sysselsättningen på kvällar och helger.", reverse:true},
+      {id:15, theme:"Stress & Välmående", text:"Osäkerhet kring min uppgift/roll gör mig ofta orolig.", reverse:true},
 
-  // Progress
-  const answeredCount = state.answers.filter(v => v !== null).length;
-  const progressPct = Math.round((answeredCount / questions.length) * 100);
-  el.bar.style.width = `${Math.max(progressPct, (state.i)/questions.length*100)}%`;
+      // Trygghet & Anställningsbarhet
+      {id:16, theme:"Trygghet & Anställningsbarhet", text:"Jag känner mig trygg i min anställning/sysselsättning eller har realistiska alternativ.", reverse:false},
+      {id:17, theme:"Trygghet & Anställningsbarhet", text:"Mitt CV/portfolio är uppdaterat och representativt.", reverse:false},
 
-  // Scale buttons 1–5
-  el.scale.innerHTML = '';
-  for (let v = 1; v <= 5; v++) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'btn';
-    b.textContent = String(v);
-    b.setAttribute('aria-label', `Välj ${v}`);
-    if (state.answers[state.i] === v) b.classList.add('selected');
-    b.addEventListener('click', () => {
-      state.answers[state.i] = v;
-      document.querySelectorAll('.scale .btn').forEach(x => x.classList.remove('selected'));
-      b.classList.add('selected');
-      el.next.disabled = false;
-    });
-    el.scale.appendChild(b);
-  }
+      // Nätverk & Synlighet
+      {id:18, theme:"Nätverk & Synlighet", text:"Jag bygger aktivt nätverk (t.ex. kollegor, branschkontakter, mentorer).", reverse:false},
+      {id:19, theme:"Nätverk & Synlighet", text:"Jag synliggör mitt arbete (t.ex. LinkedIn, GitHub, presentationer) på ett genomtänkt sätt.", reverse:false},
 
-  // Nav buttons
-  el.prev.disabled = state.i === 0;
-  el.next.textContent = state.i === questions.length - 1 ? 'Visa resultat' : 'Nästa';
-  el.next.disabled = state.answers[state.i] == null;
-}
+      // Arbetsmiljö & Kultur
+      {id:20, theme:"Arbetsmiljö & Kultur", text:"Jag upplever en stödjande arbetsmiljö och sund kultur i min vardag.", reverse:false},
+      {id:21, theme:"Arbetsmiljö & Kultur", text:"Jag har möjlighet att påverka hur vi arbetar och fattar beslut.", reverse:false},
 
-function next() {
-  if (state.i === questions.length - 1) {
-    showResult();
-  } else {
-    state.i++;
-    renderQuestion();
-  }
-}
-function prev() {
-  if (state.i > 0) {
-    state.i--;
-    renderQuestion();
-  }
-}
+      // Produktivitet & Rutiner
+      {id:22, theme:"Produktivitet & Rutiner", text:"Jag arbetar strukturerat med prioritering och fokus (t.ex. planeringssystem).", reverse:false},
+      {id:23, theme:"Produktivitet & Rutiner", text:"Jag avslutar uppgifter i tid och följer upp resultat.", reverse:false},
 
-function showResult() {
-  const answered = state.answers.filter(v => v != null);
-  const mean = answered.length ? (answered.reduce((a,b)=>a+b,0) / answered.length) : 0;
-  const total = Math.round(mean * 20); // 1–5 -> 20–100
-  const pct = total; // 0–100
+      // Arbetsmarknad & Flexibilitet
+      {id:24, theme:"Arbetsmarknad & Flexibilitet", text:"Jag är öppen för och undersöker olika vägar (jobb, praktik, studier, eget).", reverse:false},
+      {id:25, theme:"Arbetsmarknad & Flexibilitet", text:"Jag kan anpassa mig när förutsättningar förändras och hittar nya lösningar.", reverse:false},
+    ];
 
-  el.scoreTotal.textContent = `${total}`;
-  el.scoreMean.textContent = mean ? mean.toFixed(2) : '–';
-  el.coverage.textContent = `${answered.length} / ${questions.length} besvarade`;
+    // ------- Delskalor -------
+    const THEMES = {
+      "Engagemang & Motivation": [1,2,3],
+      "Karriärmål & Plan": [4,5,6],
+      "Kompetens & Lärande": [7,8,9],
+      "Arbetsbelastning & Balans": [10,11,12],
+      "Stress & Välmående": [13,14,15],
+      "Trygghet & Anställningsbarhet": [16,17],
+      "Nätverk & Synlighet": [18,19],
+      "Arbetsmiljö & Kultur": [20,21],
+      "Produktivitet & Rutiner": [22,23],
+      "Arbetsmarknad & Flexibilitet": [24,25],
+    };
 
-  // Bar color & label
-  el.scoreBar.classList.remove('ok','warn','bad');
-  let label = 'Låg';
-  if (pct >= 67) { el.scoreBar.classList.add('ok'); label='Hög'; }
-  else if (pct >= 45) { el.scoreBar.classList.add('warn'); label='Medel'; }
-  else { el.scoreBar.classList.add('bad'); label='Låg'; }
-  el.levelTag.textContent = label;
-  el.scoreBar.style.width = `${pct}%`;
+    // ------- State & DOM -------
+    const state = { index:0, answers:Array(QUESTIONS.length).fill(null) };
+    const $ = sel => document.querySelector(sel);
+    const progressEl = $('#progress'), counterEl = $('#counter');
+    const qThemeEl = $('#qTheme'), qIdEl = $('#qId'), qTextEl = $('#qText');
+    const scaleEl = $('#scale');
+    const prevBtn = $('#prevBtn'), nextBtn = $('#nextBtn'), clearBtn = $('#clearBtn');
+    const questionView = $('#questionView'), resultView = $('#resultView');
+    const totalBar = $('#totalBar'), totalTag = $('#totalTag'), totalText = $('#totalText');
+    const subscalesContainer = $('#subscalesContainer');
+    const restartBtn = $('#restartBtn'), exportBtn = $('#exportBtn');
+    const jumpUnanswered = $('#jumpUnanswered');
 
-  // List answers
-  el.list.innerHTML = '';
-  questions.forEach((q, idx) => {
-    const row = document.createElement('div');
-    row.className = 'row';
-    const ix = document.createElement('div'); ix.className='ix'; ix.textContent = `#${idx+1}`;
-    const qt = document.createElement('div'); qt.className='qt'; qt.textContent = q;
-    const ans = document.createElement('div'); ans.className='ans'; ans.textContent = state.answers[idx] ?? '–';
-    row.append(ix, qt, ans);
-    el.list.appendChild(row);
-  });
-
-  // Swap screens
-  el.screenQ.classList.add('hidden');
-  el.screenR.classList.remove('hidden');
-}
-
-function exportTxt() {
-  const lines = [];
-  lines.push('Sysselsättning – Skattningstest (25 frågor)');
-  lines.push(`Datum: ${new Date().toISOString()}`);
-  lines.push('');
-  for (let i=0;i<questions.length;i++){
-    lines.push(`Fråga ${i+1}: ${questions[i]}`);
-    lines.push(`Svar: ${state.answers[i] ?? ''}`);
-    lines.push('');
-  }
-  const answered = state.answers.filter(v => v!=null);
-  const mean = answered.length ? (answered.reduce((a,b)=>a+b,0) / answered.length) : 0;
-  const total = Math.round(mean * 20);
-  lines.push(`Medelvärde (1–5): ${mean ? mean.toFixed(2) : '-'}`);
-  lines.push(`Totalpoäng (0–100): ${isNaN(total)?'-':total}`);
-  lines.push(`Svarstäckning: ${answered.length}/${questions.length}`);
-  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'sysselsattning_svar.txt';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-}
-
-function restart() {
-  state.i = 0;
-  state.answers = Array(questions.length).fill(null);
-  el.screenR.classList.add('hidden');
-  el.screenQ.classList.remove('hidden');
-  renderQuestion();
-}
-
-// Keyboard shortcuts for speed (1–5, arrows, enter)
-document.addEventListener('keydown', (e) => {
-  if (!el.screenQ.classList.contains('hidden')) {
-    if (e.key >= '1' && e.key <= '5') {
-      const val = parseInt(e.key,10);
-      state.answers[state.i] = val;
-      renderQuestion();
-      el.next.disabled = false;
-    } else if (e.key === 'ArrowRight') {
-      if (!el.next.disabled) next();
-    } else if (e.key === 'ArrowLeft') {
-      prev();
-    } else if (e.key === 'Enter') {
-      if (!el.next.disabled) next();
+    function percentComplete(){
+      const answered = state.answers.filter(v => v!==null).length;
+      return Math.round((answered/QUESTIONS.length)*100);
     }
-  }
-});
+    function updateProgress(){
+      const pct = Math.round(((state.index)/QUESTIONS.length)*100);
+      progressEl.style.width = Math.max(pct, percentComplete()) + '%';
+      counterEl.textContent = `${Math.min(state.index+1, QUESTIONS.length)} / ${QUESTIONS.length}`;
+    }
 
-// Wire up
-el.prev.addEventListener('click', prev);
-el.next.addEventListener('click', next);
-el.export.addEventListener('click', exportTxt);
-el.restart.addEventListener('click', restart);
+    function renderQuestion(){
+      const q = QUESTIONS[state.index];
+      qThemeEl.textContent = q.theme;
+      qIdEl.textContent = `Fråga ${state.index+1}/${QUESTIONS.length}`;
+      qTextEl.textContent = q.text;
 
-// Init
-renderQuestion();
-</script>
+      scaleEl.innerHTML = '';
+      for(let i=1;i<=5;i++){
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'option';
+        el.textContent = i;             // Endast siffror
+        el.title = `${i} – ${LABELS[i]}`; // Tooltip
+        if(state.answers[state.index] === i) el.classList.add('active');
+        el.addEventListener('click', ()=>{
+          state.answers[state.index] = i;
+          renderQuestion();
+          setTimeout(()=>next(), 120);
+        });
+        scaleEl.appendChild(el);
+      }
+
+      prevBtn.disabled = state.index === 0;
+      clearBtn.disabled = state.answers[state.index] === null;
+      nextBtn.textContent = (state.index === QUESTIONS.length-1) ? 'Visa resultat' : 'Nästa';
+      updateProgress();
+    }
+
+    function next(){
+      if(state.answers[state.index] === null){ shake(scaleEl); return; }
+      if(state.index < QUESTIONS.length-1){ state.index++; renderQuestion(); }
+      else { showResult(); }
+    }
+    function prev(){ if(state.index>0){ state.index--; renderQuestion(); } }
+    function clearAnswer(){ state.answers[state.index] = null; renderQuestion(); }
+    function shake(node){
+      node.style.transform = 'translateX(0)';
+      node.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:180});
+    }
+
+    // 1..5 -> 0..100. Reverse-items inverteras.
+    function toPercent(value, reverse){
+      const v = reverse ? (6 - value) : value;
+      return ((v - 1) / 4) * 100;
+    }
+
+    function showResult(){
+      // kontrollera att allt är svarat
+      if(state.answers.some(v=>v===null)){
+        const idx = state.answers.findIndex(v=>v===null);
+        state.index = idx>=0 ? idx : 0;
+        renderQuestion();
+        return;
+      }
+      questionView.classList.add('hidden');
+      resultView.classList.remove('hidden');
+
+      // Total
+      const percents = state.answers.map((v, i)=>toPercent(v, QUESTIONS[i].reverse));
+      const total = Math.round(percents.reduce((a,b)=>a+b,0)/percents.length);
+      totalBar.style.width = total + '%';
+      const tag = total>=75 ? 'ok' : total>=50 ? 'warn' : 'bad';
+      totalTag.className = `tag ${tag}`;
+      totalTag.textContent = total>=75 ? 'Stark' : total>=50 ? 'Stabil' : 'Sårbar';
+      totalText.textContent = `Totalpoäng: ${total}/100`;
+
+      // Delskalor
+      const subscalesObj = {};
+      subscalesContainer.innerHTML = '';
+      Object.entries(THEMES).forEach(([theme, ids])=>{
+        const idxs = ids.map(n=>n-1);
+        const vals = idxs.map(i => toPercent(state.answers[i], QUESTIONS[i].reverse));
+        const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+        const row = document.createElement('div');
+        row.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+            <div><strong>${theme}</strong></div>
+            <div class="tag ${avg>=75 ? 'ok' : avg>=50 ? 'warn' : 'bad'}">${avg}/100</div>
+          </div>
+          <div class="meter"><span style="width:${avg}%; background:${avg>=75 ? 'linear-gradient(90deg,#059669,#10b981)' : avg>=50 ? 'linear-gradient(90deg,#b45309,#f59e0b)' : 'linear-gradient(90deg,#b91c1c,#ef4444)'}"></span></div>
+        `;
+        subscalesContainer.appendChild(row);
+        subscalesObj[theme] = avg;
+      });
+
+      // Gör resultat tillgängligt för formuläret
+      window.lastResult = { total, subscales: subscalesObj };
+
+      // fokus
+      exportBtn.focus();
+    }
+
+    function restart(){
+      state.index = 0;
+      state.answers = Array(QUESTIONS.length).fill(null);
+      resultView.classList.add('hidden');
+      questionView.classList.remove('hidden');
+      renderQuestion();
+    }
+
+    // Export .txt
+    function exportTxt(){
+      const ts = new Date();
+      const pad = n => String(n).padStart(2,'0');
+      const stamp = `${ts.getFullYear()}-${pad(ts.getMonth()+1)}-${pad(ts.getDate())} ${pad(ts.getHours())}:${pad(ts.getMinutes())}`;
+
+      const percents = state.answers.map((v, i)=>toPercent(v, QUESTIONS[i].reverse));
+      const total = Math.round(percents.reduce((a,b)=>a+b,0)/percents.length);
+
+      let lines = [];
+      lines.push(`Sysselsättning – Skattningstest (25 frågor)`);
+      lines.push(`Datum: ${stamp}`);
+      lines.push(``);
+      lines.push(`Svar per fråga`);
+      QUESTIONS.forEach((q, i)=>{
+        const val = state.answers[i];
+        const label = LABELS[val];
+        lines.push(`Fråga ${q.id} | ${q.theme} | ${q.text} — Svar: ${val} (${label})`);
+      });
+      lines.push(``);
+      lines.push(`Totalpoäng: ${total}/100`);
+      lines.push(``);
+      lines.push(`Delskalor:`);
+      Object.entries(THEMES).forEach(([theme, ids])=>{
+        const idxs = ids.map(n=>n-1);
+        const vals = idxs.map(i => toPercent(state.answers[i], QUESTIONS[i].reverse));
+        const avg = Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+        lines.push(`- ${theme}: ${avg}/100`);
+      });
+
+      const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sysselsattning-test_${ts.getFullYear()}-${pad(ts.getMonth()+1)}-${pad(ts.getDate())}_${pad(ts.getHours())}${pad(ts.getMinutes())}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      a.remove();
+    }
+
+    function firstUnansweredIndex(){
+      return state.answers.findIndex(v=>v===null);
+    }
+
+    // Fyll FormSubmit-formuläret med testresultat före sändning
+    function prepareFormPayload(){
+      const name = document.getElementById('cf_name').value.trim();
+      const email = document.getElementById('cf_email').value.trim();
+      const consent = document.getElementById('cf_consent').checked;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      document.getElementById('err_name').style.display = name ? 'none' : 'block';
+      document.getElementById('err_email').style.display = emailOk ? 'none' : 'block';
+      if(!name || !emailOk || !consent) return false;
+
+      const res = window.lastResult || null;
+      const totalField = document.getElementById('cf_total');
+      const summaryField = document.getElementById('cf_summary');
+      const subsField = document.getElementById('cf_subscales');
+
+      if(res){
+        totalField.value = String(res.total);
+        summaryField.value = (res.total>=75 ? 'Stark' : res.total>=50 ? 'Stabil' : 'Sårbar');
+        subsField.value = Object.entries(res.subscales).map(([k,v])=>`${k}: ${v}/100`).join(' | ');
+      } else {
+        totalField.value = '';
+        summaryField.value = '';
+        subsField.value = '';
+      }
+      return true; // låt FormSubmit skicka
+    }
+
+    // ------- Events -------
+    document.addEventListener('keydown', (e)=>{
+      if(!resultView.classList.contains('hidden')){
+        if(e.key === 'Enter'){ exportBtn.focus(); }
+        return;
+      }
+      if(['1','2','3','4','5'].includes(e.key)){
+        const val = parseInt(e.key,10);
+        state.answers[state.index] = val;
+        renderQuestion();
+        setTimeout(()=>next(), 120);
+      } else if(e.key === 'ArrowRight'){
+        next();
+      } else if(e.key === 'ArrowLeft'){
+        prev();
+      } else if(e.key === 'Enter'){
+        next();
+      }
+    });
+    nextBtn.addEventListener('click', next);
+    prevBtn.addEventListener('click', prev);
+    clearBtn.addEventListener('click', clearAnswer);
+    restartBtn.addEventListener('click', restart);
+    exportBtn.addEventListener('click', exportTxt);
+    jumpUnanswered.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const idx = firstUnansweredIndex();
+      if(idx>=0){
+        state.index = idx;
+        questionView.classList.remove('hidden');
+        resultView.classList.add('hidden');
+        renderQuestion();
+      }
+    });
+
+    // Init
+    renderQuestion();
+  </script>
 </body>
 </html>
